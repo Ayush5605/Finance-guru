@@ -3,7 +3,7 @@ import { LoginForm } from "../components/auth/loginForm.jsx";
 
 export default function Signup() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 p-4">
+        <div className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
       <LoginForm />
     </div>
   );
