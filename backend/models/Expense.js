@@ -33,6 +33,7 @@ const expenseSchema=new mongoose.Schema(
 
     ],
     default:"Other",
+    index:true,
   },
 
   date:{
@@ -45,7 +46,7 @@ const expenseSchema=new mongoose.Schema(
     trim:true,
   },
         },
-        {timestampstrue}
+        {timestamps:true}
 
 );
 
