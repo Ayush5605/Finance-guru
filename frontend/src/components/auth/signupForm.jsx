@@ -11,6 +11,7 @@ import {
 import { auth, googleProvider } from "../../firebase.js";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useState } from "react";
+import {signupUser} from "../../authContext.jsx";
 
 export function SignupForm() {
 
@@ -20,8 +21,10 @@ export function SignupForm() {
   const handleSubmit = async(e) => {
     e.preventDefault();
     try{
-        await createUserWithEmailAndPassword(auth,email,password);
-        alert("Account Created !");
+        const res=await signupUser(email,password);
+        localStorage.setItem("token",res.token);
+        navigate("/dashboard");
+        
     }catch(err){
         alert(err.message);
     }

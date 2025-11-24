@@ -1,5 +1,5 @@
 import React from "react";
-import { LoginForm } from "../components/auth/loginForm.jsx";
+import  {LoginForm}  from "../components/auth/loginForm.jsx";
 
 export default function Signup() {
   return (

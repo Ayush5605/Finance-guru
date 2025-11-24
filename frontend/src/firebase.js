@@ -3,7 +3,7 @@ import {getAuth,GoogleAuthProvider} from "firebase/auth";
 
 
 const firebaseConfig={
-     apiKey: "AIzaSyAyouA6M85QipURTK47lNdea_mSE1vyg70",
+  apiKey: "AIzaSyAyouA6M85QipURTK47lNdea_mSE1vyg70",
   authDomain: "finance-guru-254c8.firebaseapp.com",
   projectId: "finance-guru-254c8",
   storageBucket: "finance-guru-254c8.appspot.com",

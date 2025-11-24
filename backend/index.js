@@ -6,6 +6,7 @@ dotenv.config();
 import connectDB from './config/db.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import AIroutes from './routes/AIroutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 
 const app=express();
@@ -21,6 +22,7 @@ app.get("/",(req,res)=>{
 
 app.use("/api/expenses",expenseRoutes);
 app.use("/api/AI",AIroutes);
+app.use("/api/auth",authRoutes);
 
 const PORT=process.env.PORT || 5000;
 app.listen(PORT,()=>{
