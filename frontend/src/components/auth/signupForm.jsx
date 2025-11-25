@@ -9,11 +9,15 @@ import {
   
 } from "@tabler/icons-react";
 import { auth, googleProvider } from "../../firebase.js";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import {signupUser} from "../../authContext.jsx";
+import axios from "axios";
+import { signInWithRedirect } from "firebase/auth";
 
 export function SignupForm() {
+  const API_URL=import.meta.env.VITE_API_URL;
+
 
     const [email,setEmail]=useState("");
     const[password,setPassword]=useState("");
@@ -32,8 +36,11 @@ export function SignupForm() {
 
   const handleGoogle=async()=>{
     try{
-        await signInWithPopup(auth,googleProvider);
-        alert("Account created !");
+        await signInWithRedirect(auth,googleProvider);
+
+        const res=await axios.post(`${API_URL}auth/signup`);
+        res.status(200).json(message="Signup successfull");
+      
     }catch(err){
         alert(err.message);
     }

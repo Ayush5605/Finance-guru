@@ -3,13 +3,16 @@ import { Label } from "../ui/label.jsx";
 import { Input } from "../ui/input.jsx";
 import { cn } from "../..//../lib/utils.js";
 import { IconBrandGoogle } from "@tabler/icons-react";
+import axios from "axios";
 
 import { auth, googleProvider } from "../../firebase.js";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword} from "firebase/auth";
 import {loginUser} from "../../authContext.jsx";
+import { signInWithRedirect } from "firebase/auth";
 
 
 export function LoginForm() {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -27,7 +30,11 @@ export function LoginForm() {
 
   const handleGoogle = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+     await signInWithRedirect(auth,googleProvider);
+
+      const res=await axios.post(`${API_URL}auth/login`,{token});
+              res.status(200).json(message="Login successfull");
+
     } catch (err) {
       alert(err.message);
     }

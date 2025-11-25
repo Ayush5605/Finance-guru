@@ -9,7 +9,7 @@ export const loginUser=async(email,password)=>{
     const userCred=await signInWithEmailAndPassword(auth,email,password);
     const token=await userCred.user.getIdToken();
 
-    const res=await axios.post(`${API_URL}/api/auth.login`,{token});
+    const res=await axios.post(`${API_URL}/api/auth/login`,{token});
     return res.data;
 
 }

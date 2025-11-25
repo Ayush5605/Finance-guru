@@ -22,12 +22,19 @@ const userSchema=new mongoose.Schema(
             type:Boolean,
         default:false,
         },
-        premiumSice:{
+        premiumSince:{
             type:Date,
         },
-        monthluBudget:{
+        monthlyBudget:{
             type:Number,
             default:0,
+        },
+        createdAt:{
+            type:Date,
+            default:Date.now,
+        },
+        lastLogin:{
+            type:Date,
         }
 
         
