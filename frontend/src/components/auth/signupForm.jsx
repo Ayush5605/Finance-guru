@@ -116,6 +116,12 @@ export function SignupForm() {
           </button>
          
         </div>
+         <p className="text-center text-sm mt-4 text-neutral-600 dark:text-neutral-300">
+          Already have an account?{" "}
+          <a href="/" className="underline">
+            Login
+          </a>
+        </p>
       </form>
     </div>
   );
