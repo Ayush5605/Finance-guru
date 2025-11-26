@@ -5,6 +5,8 @@ import './App.css';
 import  Signup from './pages/signup.jsx';
 import Login from './pages/Login.jsx';
 import {BrowserRouter,Routes,Route} from 'react-router-dom';
+import Dashboard from './components/layouts/dashboard.jsx';
+import DashboardPage from './pages/dashboardPage';
 
 
 function App() {
@@ -15,6 +17,14 @@ function App() {
     <Routes>
       <Route path="/" element={<Login/>}/>
       <Route path="/signup" element={<Signup/>}/>
+
+      <Route path="/dashboard"
+      element={
+        <Dashboard>
+          <DashboardPage/>
+        </Dashboard>
+      }
+      />
       </Routes>
     </BrowserRouter>
    

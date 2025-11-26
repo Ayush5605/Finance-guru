@@ -9,9 +9,13 @@ import { auth, googleProvider } from "../../firebase.js";
 import { signInWithEmailAndPassword} from "firebase/auth";
 import {loginUser} from "../../authContext.jsx";
 import { signInWithRedirect } from "firebase/auth";
+import {redirect, useNavigate} from "react-router-dom";
+
 
 
 export function LoginForm() {
+    const navigate=useNavigate();
+  
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

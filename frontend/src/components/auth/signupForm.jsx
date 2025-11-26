@@ -14,23 +14,34 @@ import { useState } from "react";
 import {signupUser} from "../../authContext.jsx";
 import axios from "axios";
 import { signInWithRedirect } from "firebase/auth";
+import {redirect, useNavigate} from "react-router-dom";
 
 export function SignupForm() {
+  const navigate=useNavigate();
   const API_URL=import.meta.env.VITE_API_URL;
+
+  
 
 
     const [email,setEmail]=useState("");
     const[password,setPassword]=useState("");
 
+
+
   const handleSubmit = async(e) => {
     e.preventDefault();
+
+  
     try{
         const res=await signupUser(email,password);
         localStorage.setItem("token",res.token);
         navigate("/dashboard");
+         const userCred = await createUserWithEmailAndPassword(auth, email, password);
+         console.log("User:", userCred);
         
     }catch(err){
         alert(err.message);
+        console.log("Firebase signup error:", err.code, err.message);
     }
   };
 
@@ -40,6 +51,7 @@ export function SignupForm() {
 
         const res=await axios.post(`${API_URL}auth/signup`);
         res.status(200).json(message="Signup successfull");
+        navigate("/dashboard");
       
     }catch(err){
         alert(err.message);
