@@ -17,6 +17,7 @@ const expenseSchema=new mongoose.Schema(
     type:Number,
     required:true,
     min:0,
+    default:0,
   },
   category:{
     type:String,
@@ -34,6 +35,12 @@ const expenseSchema=new mongoose.Schema(
     ],
     default:"Other",
     index:true,
+  },
+  type:{
+    type:String,
+    required:true,
+    enum:["Income,Expense"],
+    
   },
 
   date:{

@@ -49,7 +49,7 @@ export default function Dashboard({children}){
       </Sidebar>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 p-6 overflow-y-auto">
+      <div className="flex-1 overflow-hidden">
         {children}
       </div>
 
