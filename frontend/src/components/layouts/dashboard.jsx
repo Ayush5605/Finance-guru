@@ -17,7 +17,7 @@ export default function Dashboard({children}){
         },
          {
             label:"Expenses",
-            href:"/api/expenses",
+            href:"/expenses",
             icon:<IconWallet size={18}/>
         },
          {

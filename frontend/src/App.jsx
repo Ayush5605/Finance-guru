@@ -7,6 +7,8 @@ import Login from './pages/Login.jsx';
 import {BrowserRouter,Routes,Route} from 'react-router-dom';
 import Dashboard from './components/layouts/dashboard.jsx';
 import DashboardPage from './pages/dashboardPage';
+import ExpensePage from './pages/ExpensePage';
+import AddExpense from './components/layouts/AddExpense';
 
 
 function App() {
@@ -25,6 +27,25 @@ function App() {
         </Dashboard>
       }
       />
+
+      <Route path="/expenses"
+      element={
+        <Dashboard>
+                  <ExpensePage/>
+
+
+        </Dashboard>
+      }
+      />
+
+       <Route
+          path="/add"
+          element={
+            <Dashboard>
+              <AddExpense />
+            </Dashboard>
+          }
+        />
       </Routes>
     </BrowserRouter>
    

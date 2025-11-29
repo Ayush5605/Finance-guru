@@ -23,10 +23,31 @@ export function LoginForm() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res=await loginUser(email,password);
-      localStorage.setItem("token",res.token);
-      navigate("/dashboard");
-      // redirect later if needed
+
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+
+    
+    const token = await user.getIdToken();
+
+    
+    const res = await axios.post("http://localhost:5000/api/auth/login", {
+      token,
+    });
+
+    
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        token,
+        uid: user.uid,
+        email: user.email,
+        name: res.data.user.name, // if you saved name in DB
+      })
+    );
+
+    
+    navigate("/dashboard");
+      
     } catch (err) {
       alert(err.message);
     }

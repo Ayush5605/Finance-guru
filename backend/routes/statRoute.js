@@ -4,7 +4,7 @@ import { getStats } from '../controllers/statController.js';
 
 const statRoutes=express.Router();
 
-router.get("/stats/:userId",getStats);
+statRoutes.get("/stats/:userId",getStats);
 
 export default statRoutes;
     

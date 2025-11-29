@@ -34,8 +34,9 @@ export function SignupForm() {
   
     try{
         const res=await signupUser(email,password);
-        localStorage.setItem("token",res.token);
         navigate("/dashboard");
+        localStorage.setItem("token",res.token);
+        
          const userCred = await createUserWithEmailAndPassword(auth, email, password);
          console.log("User:", userCred);
         
@@ -50,8 +51,9 @@ export function SignupForm() {
         await signInWithRedirect(auth,googleProvider);
 
         const res=await axios.post(`${API_URL}auth/signup`);
-        res.status(200).json(message="Signup successfull");
         navigate("/dashboard");
+        res.status(200).json(message="Signup successfull");
+        
       
     }catch(err){
         alert(err.message);

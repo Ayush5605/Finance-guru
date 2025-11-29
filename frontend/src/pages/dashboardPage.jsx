@@ -1,9 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Boxes } from "../components/ui/background-boxes";
 import { CardSpotlight } from "../components/ui/card-spotlight.jsx";
-import { ArrowDownCircle, ArrowUpCircle, Wallet, TrendingUp, Calendar, PieChart } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Wallet, TrendingUp, Calendar } from "lucide-react";
+import { getExpense } from "../api/expenseAPI.js";
 
-export default function DashboardPage({balance,income,expenses}) {
+export default function DashboardPage() {
+  const [balance, setBalance] = useState(0);
+  const [income, setIncome] = useState(0);
+  const [expenses, setExpenses] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await getExpense();
+      const transactions = response.data || [];
+      
+      let totalIncome = 0;
+      let totalExpenses = 0;
+
+      transactions.forEach((transaction) => {
+        if (transaction.type === "income") {
+          totalIncome += transaction.amount || 0;
+        } else if (transaction.type === "expense") {
+          totalExpenses += transaction.amount || 0;
+        }
+      });
+
+      setIncome(totalIncome);
+      setExpenses(totalExpenses);
+      setBalance(totalIncome - totalExpenses);
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+      setIncome(0);
+      setExpenses(0);
+      setBalance(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatAmount = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Background */}
@@ -14,7 +59,7 @@ export default function DashboardPage({balance,income,expenses}) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}
           <div className="mb-10">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
               <div>
                 <h1 className="text-5xl font-bold text-white mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Dashboard
@@ -38,15 +83,27 @@ export default function DashboardPage({balance,income,expenses}) {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <p className="text-gray-400 text-sm font-medium uppercase tracking-wide mb-3">Total Balance</p>
-                  <h2 className="text-4xl font-bold text-white mb-2">₹{balance}</h2>
+                  <h2 className="text-4xl font-bold text-white mb-2">
+                    {loading ? "..." : `₹${formatAmount(balance)}`}
+                  </h2>
                   <div className="flex items-center gap-2 mt-3">
-                    <div className="px-2 py-1 bg-green-500/20 rounded-md border border-green-500/30">
-                      <p className="text-green-400 text-xs font-semibold flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3" />
-                        +12.5%
+                    <div className={`px-2 py-1 rounded-md border ${
+                      balance >= 0 
+                        ? "bg-green-500/20 border-green-500/30" 
+                        : "bg-red-500/20 border-red-500/30"
+                    }`}>
+                      <p className={`text-xs font-semibold flex items-center gap-1 ${
+                        balance >= 0 ? "text-green-400" : "text-red-400"
+                      }`}>
+                        {balance >= 0 ? (
+                          <TrendingUp className="h-3 w-3" />
+                        ) : (
+                          <TrendingUp className="h-3 w-3 rotate-180" />
+                        )}
+                        {balance >= 0 ? "Positive" : "Negative"}
                       </p>
                     </div>
-                    <span className="text-gray-500 text-xs">from last month</span>
+                    <span className="text-gray-500 text-xs">current balance</span>
                   </div>
                 </div>
                 <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 shadow-lg">
@@ -63,15 +120,17 @@ export default function DashboardPage({balance,income,expenses}) {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <p className="text-gray-400 text-sm font-medium uppercase tracking-wide mb-3">Total Income</p>
-                  <h2 className="text-4xl font-bold text-green-400 mb-2">₹{income}</h2>
+                  <h2 className="text-4xl font-bold text-green-400 mb-2">
+                    {loading ? "..." : `₹${formatAmount(income)}`}
+                  </h2>
                   <div className="flex items-center gap-2 mt-3">
                     <div className="px-2 py-1 bg-green-500/20 rounded-md border border-green-500/30">
                       <p className="text-green-300 text-xs font-semibold flex items-center gap-1">
                         <TrendingUp className="h-3 w-3" />
-                        +8.2%
+                        Total
                       </p>
                     </div>
-                    <span className="text-gray-500 text-xs">from last month</span>
+                    <span className="text-gray-500 text-xs">all time</span>
                   </div>
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/20 shadow-lg">
@@ -88,15 +147,17 @@ export default function DashboardPage({balance,income,expenses}) {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <p className="text-gray-400 text-sm font-medium uppercase tracking-wide mb-3">Total Expenses</p>
-                  <h2 className="text-4xl font-bold text-red-400 mb-2">₹{expenses}</h2>
+                  <h2 className="text-4xl font-bold text-red-400 mb-2">
+                    {loading ? "..." : `₹${formatAmount(expenses)}`}
+                  </h2>
                   <div className="flex items-center gap-2 mt-3">
                     <div className="px-2 py-1 bg-red-500/20 rounded-md border border-red-500/30">
                       <p className="text-red-300 text-xs font-semibold flex items-center gap-1">
                         <TrendingUp className="h-3 w-3 rotate-180" />
-                        -5.3%
+                        Total
                       </p>
                     </div>
-                    <span className="text-gray-500 text-xs">from last month</span>
+                    <span className="text-gray-500 text-xs">all time</span>
                   </div>
                 </div>
                 <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 shadow-lg">
@@ -104,26 +165,6 @@ export default function DashboardPage({balance,income,expenses}) {
                 </div>
               </div>
             </CardSpotlight>
-          </div>
-
-          {/* Additional Content Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Placeholder for future charts or additional content */}
-            <div className="bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-lg p-6 min-h-[300px] flex items-center justify-center">
-              <div className="text-center">
-                <PieChart className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-500 text-sm">Expense Categories Chart</p>
-                <p className="text-gray-600 text-xs mt-2">Coming soon...</p>
-              </div>
-            </div>
-            
-            <div className="bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-lg p-6 min-h-[300px] flex items-center justify-center">
-              <div className="text-center">
-                <Calendar className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-500 text-sm">Recent Transactions</p>
-                <p className="text-gray-600 text-xs mt-2">Coming soon...</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
