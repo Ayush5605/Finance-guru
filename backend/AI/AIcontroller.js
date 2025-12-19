@@ -10,7 +10,8 @@ export const analyzewithAI=async(req,res)=>{
 
     try{
         const {query}=req.body;
-        const expenses=await Expenses.find().lean();
+        const userId=req.user.uid;
+        const expenses=await Expenses.find({userId}).lean();
     const model=genAI.getGenerativeModel({model:"gemini-pro"});
 
     const prompt=`You are an AI financial assistant. The user has a list of expenses in JSON format 

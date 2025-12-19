@@ -4,15 +4,15 @@ import admin from "firebase-admin";
 
 const router = express.Router();
 
-// SIGNUP or LOGIN with Firebase Token
+
 router.post("/signup", async (req, res) => {
     const { token } = req.body;
 
     try {
-        // Verify Firebase token
+        
         const decoded = await admin.auth().verifyIdToken(token);
 
-        // Check user in DB
+        
         let user = await User.findOne({ uid: decoded.uid });
 
         if(user){

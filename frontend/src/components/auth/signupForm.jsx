@@ -1,64 +1,109 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Input} from "../ui/input.jsx";
 import { Label } from "../ui/label.jsx";
 import { cn } from "../../../lib/utils.js";
-import {
-  
-  IconBrandGoogle,
-  
-} from "@tabler/icons-react";
+import { IconBrandGoogle } from "@tabler/icons-react";
 import { auth, googleProvider } from "../../firebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
-import {signupUser} from "../../authContext.jsx";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import axios from "axios";
-import { signInWithRedirect } from "firebase/auth";
-import {redirect, useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function SignupForm() {
-  const navigate=useNavigate();
-  const API_URL=import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/";
 
-  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-
-    const [email,setEmail]=useState("");
-    const[password,setPassword]=useState("");
-
-
-
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-  
-    try{
-        const res=await signupUser(email,password);
-        navigate("/dashboard");
-        localStorage.setItem("token",res.token);
-        
-         const userCred = await createUserWithEmailAndPassword(auth, email, password);
-         console.log("User:", userCred);
-        
-    }catch(err){
-        alert(err.message);
-        console.log("Firebase signup error:", err.code, err.message);
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCred.user;
+      const token = await user.getIdToken();
+
+      const res = await axios.post(
+        `${API_URL}api/auth/signup`,
+        { token }
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          token,
+          uid: user.uid,
+          email: user.email,
+          name: res.data.user?.name || user.displayName || "",
+        })
+      );
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Signup error:", err);
+      let errorMessage = "Signup failed. Please try again.";
+      
+      if (err.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already registered. Please login instead.";
+      } else if (err.code === "auth/weak-password") {
+        errorMessage = "Password should be at least 6 characters.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address.";
+      } else if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGoogle=async()=>{
-    try{
-        await signInWithRedirect(auth,googleProvider);
+  const handleGoogle = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const token = await user.getIdToken();
 
-        const res=await axios.post(`${API_URL}auth/signup`);
-        navigate("/dashboard");
-        res.status(200).json(message="Signup successfull");
-        
-      
-    }catch(err){
-        alert(err.message);
+      // Try login first (in case user already exists)
+      let res;
+      try {
+        res = await axios.post(`${API_URL}api/auth/login`, { token });
+      } catch (loginErr) {
+        // If login fails, try signup
+        if (loginErr.response?.status === 404) {
+          res = await axios.post(`${API_URL}api/auth/signup`, { token });
+        } else {
+          throw loginErr;
+        }
+      }
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          token,
+          uid: user.uid,
+          email: user.email,
+          name: res.data.user?.name || user.displayName || "",
+        })
+      );
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Google signup error:", err);
+      if (err.code !== "auth/popup-closed-by-user") {
+        alert(err.response?.data?.error || err.message || "Google signup failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-  }
+  };
   return (
     <div
       className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
@@ -95,9 +140,11 @@ export function SignupForm() {
         
 
         <button
-          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
-          type="submit">
-          Sign up &rarr;
+          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] disabled:opacity-50 disabled:cursor-not-allowed"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Signing up..." : "Sign up &rarr;"}
           <BottomGradient />
         </button>
 
@@ -107,12 +154,14 @@ export function SignupForm() {
         <div className="flex flex-col space-y-4">
           
           <button
-          onClick={handleGoogle}
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
-            type="button">
+            onClick={handleGoogle}
+            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] disabled:opacity-50 disabled:cursor-not-allowed"
+            type="button"
+            disabled={loading}
+          >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-sm text-neutral-700 dark:text-neutral-300">
-              Google
+              {loading ? "Connecting..." : "Continue with Google"}
             </span>
             <BottomGradient />
           </button>

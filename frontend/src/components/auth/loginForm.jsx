@@ -6,62 +6,77 @@ import { IconBrandGoogle } from "@tabler/icons-react";
 import axios from "axios";
 
 import { auth, googleProvider } from "../../firebase.js";
-import { signInWithEmailAndPassword} from "firebase/auth";
-import {loginUser} from "../../authContext.jsx";
-import { signInWithRedirect } from "firebase/auth";
-import {redirect, useNavigate} from "react-router-dom";
-
-
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
-    const navigate=useNavigate();
-  
+  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     try {
-
       const { user } = await signInWithEmailAndPassword(auth, email, password);
+      const token = await user.getIdToken();
 
-    
-    const token = await user.getIdToken();
-
-    
-    const res = await axios.post("http://localhost:5000/api/auth/login", {
-      token,
-    });
-
-    
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
+      const res = await axios.post(`${API_URL}api/auth/login`, {
         token,
-        uid: user.uid,
-        email: user.email,
-        name: res.data.user.name, // if you saved name in DB
-      })
-    );
+      });
 
-    
-    navigate("/dashboard");
-      
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          token,
+          uid: user.uid,
+          email: user.email,
+          name: res.data.user?.name || user.displayName || "",
+        })
+      );
+
+      navigate("/dashboard");
     } catch (err) {
-      alert(err.message);
+      console.error("Login error:", err);
+      alert(err.response?.data?.error || err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogle = async () => {
     try {
-     await signInWithRedirect(auth,googleProvider);
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const token = await user.getIdToken();
 
-      const res=await axios.post(`${API_URL}auth/login`,{token});
-              res.status(200).json(message="Login successfull");
+      const res = await axios.post(`${API_URL}api/auth/login`, {
+        token,
+      });
 
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          token,
+          uid: user.uid,
+          email: user.email,
+          name: res.data.user?.name || user.displayName || "",
+        })
+      );
+
+      navigate("/dashboard");
     } catch (err) {
-      alert(err.message);
+      console.error("Google login error:", err);
+      if (err.code !== "auth/popup-closed-by-user") {
+        alert(err.response?.data?.error || err.message || "Google login failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,10 +114,11 @@ export function LoginForm() {
         </LabelInputContainer>
 
         <button
-          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] disabled:opacity-50 disabled:cursor-not-allowed"
           type="submit"
+          disabled={loading}
         >
-          Login &rarr;
+          {loading ? "Logging in..." : "Login &rarr;"}
           <BottomGradient />
         </button>
 
@@ -111,12 +127,13 @@ export function LoginForm() {
         <div className="flex flex-col space-y-4">
           <button
             onClick={handleGoogle}
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
+            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] disabled:opacity-50 disabled:cursor-not-allowed"
             type="button"
+            disabled={loading}
           >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-sm text-neutral-700 dark:text-neutral-300">
-              Continue with Google
+              {loading ? "Connecting..." : "Continue with Google"}
             </span>
             <BottomGradient />
           </button>
