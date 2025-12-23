@@ -3,7 +3,8 @@ import React from "react";
 import { Sidebar,SidebarBody,SidebarLink } from '../ui/sidebar.jsx';
 import { useLocation } from "react-router-dom";
 import { IconHome,IconWallet,IconUser } from "@tabler/icons-react";
-import{cn} from '../../lib/utils.js'
+import{cn} from '../../lib/utils.js';
+import ChatBot from '../chatBot/chatBot.jsx';
 
 export default function Dashboard({children}){
     const location=useLocation();
@@ -52,6 +53,7 @@ export default function Dashboard({children}){
       <div className="flex-1 overflow-hidden">
         {children}
       </div>
+       <ChatBot />
 
     </div>
   );
