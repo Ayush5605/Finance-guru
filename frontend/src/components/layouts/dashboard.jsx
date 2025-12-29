@@ -50,7 +50,7 @@ export default function Dashboard({children}){
       </Sidebar>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden min-w-0">
         {children}
       </div>
        <ChatBot />

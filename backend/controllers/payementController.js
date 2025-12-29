@@ -1,11 +1,14 @@
-import {razorpay} from "../utils/razorpay.js";
+import razorpay from "../utils/razorpay.js";
 
 export const createOrder=async(req,res)=>{
     try{
+
+        const{amount}=req.body;
+
         const order=await razorpay.orders.create({
-            amount:49,
+            amount:0.49*100,
             currency:"INR",
-            receipt:`receipt_${Date.now}`
+            receipt:`receipt_${Date.now()}`
         });
 
         res.json(order);

@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "chart.js": "^4.5.1",
+    "crypto": "^1.0.1",
+    "razorpay": "^2.9.6",
     "react-chartjs-2": "^5.3.1"
   }
 }

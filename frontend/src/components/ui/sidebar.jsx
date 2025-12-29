@@ -94,7 +94,7 @@ export const MobileSidebar = ({
         {...props}>
         <div className="flex justify-end z-20 w-full">
           <IconMenu2
-            className="text-neutral-800 dark:text-neutral-200"
+            className="text-neutral-800 dark:text-neutral-200 cursor-pointer h-6 w-6 sm:h-7 sm:w-7"
             onClick={() => setOpen(!open)} />
         </div>
         <AnimatePresence>
@@ -108,13 +108,13 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
+                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-6 sm:p-8 md:p-10 z-[100] flex flex-col justify-between",
                 className
               )}>
               <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
+                className="absolute right-4 sm:right-6 md:right-10 top-4 sm:top-6 md:top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
                 onClick={() => setOpen(!open)}>
-                <IconX />
+                <IconX className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
               {children}
             </motion.div>
