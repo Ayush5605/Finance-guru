@@ -9,6 +9,7 @@ import Dashboard from './components/layouts/dashboard.jsx';
 import DashboardPage from './pages/dashboardPage';
 import ExpensePage from './pages/ExpensePage';
 import AddExpense from './components/layouts/AddExpense';
+import Checkout from './pages/Checkout';
 
 
 function App() {
@@ -45,6 +46,15 @@ function App() {
               <AddExpense />
             </Dashboard>
           }
+        />
+
+        <Route
+        path="/checkout"
+        element={
+          <Dashboard>
+            <Checkout/>
+          </Dashboard>
+        }
         />
       </Routes>
     </BrowserRouter>
