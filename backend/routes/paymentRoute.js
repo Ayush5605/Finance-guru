@@ -11,5 +11,6 @@ const paymentRouter=express.Router();
 
 
 paymentRouter.post("/create-order", createOrder);
+paymentRouter.post("/verify",verifyUser,verifyPayment);
 
 export default paymentRouter;

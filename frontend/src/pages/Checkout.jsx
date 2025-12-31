@@ -1,26 +1,59 @@
 import React from "react";
-
+import axios from "axios";
 
 export default function Checkout(){
-    const openCheckout=()=>{
-        const options={
+    const openCheckout=async()=>{
+
+
+        try{
+
+            const res=await axios.post("http://localhost:5000/api/payement/create-order",
+                {},
+                {
+                    headers:{
+                        Authorization:`Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+
+            const {order}=res.data;
+
+
+            const options={
             key:import.meta.env.VITE_RAZORPAY_KEY,
-            amount:10000,
+            amount:order.amount,
             currency:"INR",
+            order_id:order.id,
             name:"Finance Guru",
-            description:"Test Payment",
-            handler:function(response){
-                console.log("Payment success",response);
-                alert("payment successfull !");
+            description:"Premium subscription",
+            handler:async function(response){
+                await axios.post(
+                    "http://localhost:5000/api/payment/verify",
+                    response,
+                    {
+                       headers:{
+                        Authorization:`Bearer ${localStorage.getItem("token")}`,
+                       },
+                    }
+                );
+                alert("Payement successfull & premium unlocked !!");
 
             },
             theme:{
                 color:"#3399cc"
             }
-        };
 
+        }
         const rzp=new window.Razorpay(options);
         rzp.open();
+        
+        }catch(err){
+            console.error(err);
+            alert("Payment failed");
+            
+        }
+
+        
     };
 
     return(

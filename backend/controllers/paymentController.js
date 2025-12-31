@@ -1,4 +1,6 @@
 import razorpay from "../utils/razorpay.js";
+import crypto from "crypto";
+import User from "../models/userModel.js";
 
 export const createOrder = async (req, res) => {
     try {
@@ -32,4 +34,31 @@ export const createOrder = async (req, res) => {
             message: error.message || "Internal server error"
         });
     }
+};
+
+
+export const verifyPayment=async(req,res)=>{
+    const{
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+    }=req.body;
+
+    const body=razorpay_order_id +"|"+razorpay_payment_id;
+
+    const expextedSignature=crypto
+    .createHmac("sha256",process.env.RAZORPAY_KEY_SECRET)
+    .update(body)
+    .digest("hex");
+
+    if(expextedSignature!==razorpay_signature){
+        return res.status(400).json({success:false});
+    }
+
+    await User.findByIdAndUpdate(req.user.id,{
+        isPremium:true,
+    })
+
+    res.json({success:true});
+
 };

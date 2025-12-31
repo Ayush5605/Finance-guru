@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();
 import Expenses from "../models/Expense.js";
+import User from"../models/userModel.js";
 
 const genAI=new GoogleGenerativeAI(process.env.AI_API_KEY);
 
@@ -10,7 +11,13 @@ export const analyzewithAI=async(req,res)=>{
 
     try{
         const {query}=req.body;
-        const userId=req.user.uid;
+        const userId=req.user.id;
+
+        const user=await User.findById(userId).select("isPremium");
+
+        if(!user || !user.isPremium){
+            return res.status(403).json({message:"Premium subscription required to use AI feature"});
+        }
         const expenses=await Expenses.find({userId}).lean();
     const model=genAI.getGenerativeModel({model:"gemini-pro"});
 
