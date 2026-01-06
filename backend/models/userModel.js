@@ -18,7 +18,7 @@ const userSchema=new mongoose.Schema(
             type:String,
         },
 
-        premium:{
+        isPremium:{
             type:Boolean,
         default:false,
         },

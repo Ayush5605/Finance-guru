@@ -7,8 +7,8 @@ export default function Checkout(){
 
         try{
 
-            const res=await axios.post("http://localhost:5000/api/payement/create-order",
-                {},
+            const res=await axios.post("http://localhost:5000/api/payment/create-order",
+                {amount:49},
                 {
                     headers:{
                         Authorization:`Bearer ${localStorage.getItem("token")}`,
@@ -28,7 +28,7 @@ export default function Checkout(){
             description:"Premium subscription",
             handler:async function(response){
                 await axios.post(
-                    "http://localhost:5000/api/payment/verify",
+                    "http://localhost:5000/api/payment/verify-payment",
                     response,
                     {
                        headers:{
@@ -69,7 +69,7 @@ export default function Checkout(){
           fontSize: "16px",
 
         }}>
-            Pay ₹100
+            Pay ₹49
         </button>
     )
 }

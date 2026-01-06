@@ -1,16 +1,28 @@
 import admin from '../config/firebase.js';
+import User from "../models/userModel.js";
 
 export const verifyUser=async(req,res,next)=>{
 
     try{
-        const token=req.headers.authorization?.split(" ")[1];
+        const authheader=req.headers.authorization;
 
-        if(!token){
+        if(!authheader || !authheader.startWith("Bearer ")){
             return res.status(401).json({message:"No token provided"});
         }
 
-        const decodedToken=await admin.auth().verifyIdToken(token);
-        req.user=decodedToken;
+        const token=authheader.split(" ")[1];
+        const decoded=await admin.auth().verifyIdToken(token);
+        const user=await User.findOne({uid:decoded.uid})
+
+        if(!user){
+            return res.status(401).json({messaage:"User not found"});
+        }
+        req.user={
+            id:user._id,
+            email:user.email,
+            isPremium:user.isPremium,
+            name:user.name
+        }
         next();
     }catch(err){
         console.log("Auth Error :",err);
