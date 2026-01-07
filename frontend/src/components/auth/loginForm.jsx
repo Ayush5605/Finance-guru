@@ -55,7 +55,7 @@ export function LoginForm() {
       const user = result.user;
       const token = await user.getIdToken();
 
-      const res = await axios.post(`${API_URL}api/auth/login`, {
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
         token,
       });
 

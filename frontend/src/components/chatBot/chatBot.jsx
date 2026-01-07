@@ -13,7 +13,13 @@ export default function ChatBot() {
 
   const handleClick=()=>{
     if(loading)return;
-
+    
+    
+    if(isPremium===true){
+    setOpen(true);
+    return;
+  }
+  
     if(!isPremium){
       navigate("/checkout");
       return;

@@ -3,7 +3,7 @@ import User from "../models/userModel.js";
 
 export const verifyUser=async(req,res,next)=>{
 
-    console.log("AUTH HEADER RECEIVED:", req.headers.authorization);
+    
 
 
     try{

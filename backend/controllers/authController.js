@@ -50,7 +50,7 @@ export const login=async(req,res)=>{
 
 
 const { token } = req.body;
-console.log(token);
+
 
     try {
         const decoded = await admin.auth().verifyIdToken(token);

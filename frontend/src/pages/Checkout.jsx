@@ -1,8 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // User context to know if the user is already premium
+  const { isPremium, loading, setIsPremium } = useUser();
+  const navigate = useNavigate();
+
+  // If user is already premium, don't let them stay on checkout
+  useEffect(() => {
+    if (!loading && isPremium) {
+      navigate("/dashboard");
+    }
+  }, [isPremium, loading, navigate]);
 
   const openCheckout = async () => {
     if (!window.Razorpay) {
@@ -33,16 +46,28 @@ export default function Checkout() {
         name: "Finance Guru",
         description: "Premium subscription",
         handler: async function (response) {
-          await axios.post(
-            "http://localhost:5000/api/payment/verify-payment",
-            response,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
-          );
-          alert("Payment successful — premium unlocked!");
+          try {
+            await axios.post(
+              "http://localhost:5000/api/payment/verify-payment",
+              response,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+
+            // Mark user as premium in frontend state so ChatBot opens directly
+            setIsPremium(true);
+
+            alert("Payment successful — premium unlocked!");
+
+            // Redirect them back to the main experience
+            navigate("/dashboard");
+          } catch (err) {
+            console.error(err);
+            alert("Payment verification failed. Please contact support.");
+          }
         },
         theme: {
           color: "#6366f1",
@@ -58,6 +83,21 @@ export default function Checkout() {
       setIsProcessing(false);
     }
   };
+
+  // While we are checking whether the user is premium, avoid flicker
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center bg-slate-950 text-white">
+        <span className="text-sm text-slate-200">Checking your plan...</span>
+      </div>
+    );
+  }
+
+  // If the user is premium, we immediately navigate away in useEffect,
+  // but returning null here avoids rendering the pay UI for a frame.
+  if (isPremium) {
+    return null;
+  }
 
   const perks = [
     "Unlimited expense entries & exports",
