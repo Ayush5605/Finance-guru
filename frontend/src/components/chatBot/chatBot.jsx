@@ -15,7 +15,7 @@ export default function ChatBot() {
     if(loading)return;
 
     if(!isPremium){
-      navigate("/premium");
+      navigate("/checkout");
       return;
     }
 

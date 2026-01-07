@@ -1,3 +1,11 @@
+import express from "express";
+import User from "../models/userModel.js";
+import admin from "firebase-admin";
+import { verifyUser } from "../middlewares/authMiddleware.js";
+
+
+
+
 export const signup=async(req,res)=>{
  
  
@@ -38,7 +46,11 @@ export const signup=async(req,res)=>{
 export const login=async(req,res)=>{
 
 
+    
+
+
 const { token } = req.body;
+console.log(token);
 
     try {
         const decoded = await admin.auth().verifyIdToken(token);

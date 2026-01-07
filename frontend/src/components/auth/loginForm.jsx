@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/";
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/,"");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +25,7 @@ export function LoginForm() {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       const token = await user.getIdToken();
 
-      const res = await axios.post(`${API_URL}api/auth/login`, {
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
         token,
       });
 
