@@ -23,7 +23,7 @@ export const analyzewithAI=async(req,res)=>{
             return res.status(400).json({message:"Invalid query"})
         }
         const expenses=await Expenses.find({userId}).lean();
-    const model=genAI.getGenerativeModel({model:"gemini-1.5-pro-latest"});
+    const model=genAI.getGenerativeModel({model:"gemini-3-flash-preview"});
 
     const prompt=`You are an AI financial assistant. The user has a list of expenses in JSON format 
 and a question about their spending. Analyze the expenses, look for patterns, 
