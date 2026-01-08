@@ -13,13 +13,17 @@ export const analyzewithAI=async(req,res)=>{
         const {query}=req.body;
         const userId=req.user.id;
 
-        const user=await User.findById(userId).select("isPremium");
+    
 
-        if(!user || !user.isPremium){
+        if(!req.user.isPremium){
             return res.status(403).json({message:"Premium subscription required to use AI feature"});
         }
+
+        if(!query || query.length >500){
+            return res.status(400).json({message:"Invalid query"})
+        }
         const expenses=await Expenses.find({userId}).lean();
-    const model=genAI.getGenerativeModel({model:"gemini-pro"});
+    const model=genAI.getGenerativeModel({model:"gemini-1.5-pro-latest"});
 
     const prompt=`You are an AI financial assistant. The user has a list of expenses in JSON format 
 and a question about their spending. Analyze the expenses, look for patterns, 

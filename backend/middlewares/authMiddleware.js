@@ -27,6 +27,8 @@ export const verifyUser=async(req,res,next)=>{
             isPremium:user.isPremium,
             name:user.name
         }
+
+        
         next();
     }catch(err){
         console.log("Auth Error :",err);

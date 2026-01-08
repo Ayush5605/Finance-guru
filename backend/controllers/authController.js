@@ -75,13 +75,21 @@ const { token } = req.body;
 
 export const getMe=async(req,res)=>{
     try{
+
+         
+        let user=req.user;
+        console.log(user.isPremium);
         res.status(200).json({
             user:{
-                id:req.user._id,
+                id:req.user.id,
                 email:req.user.email,
                 isPremium:req.user.isPremium
             }
+
+            
         })
+
+       
     }catch(err){
         res.status(500).json({message:"Failed to fetch user"});
     }
